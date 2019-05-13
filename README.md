@@ -1,6 +1,12 @@
 getting started
+
+Ubuntu
 ```bash
 cp env.template .env
+```
+Windows
+```bash
+copy env.template .env
 ```
 
 postgres
