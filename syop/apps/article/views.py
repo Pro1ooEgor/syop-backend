@@ -1,23 +1,31 @@
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 
-from .models import Article
-from .serializers import ArticleSerializer
+from article.models import Article
+from article.serializers import ArticleSerializer, CreateArticleSerializer
 
 
 class ArticleList(APIView):
     """
     List all articles, or create a new article.
     """
+    permission_classes = [AllowAny]
+
     def get(self, request, format=None):
-        snippets = Article.objects.all()
+        search = request.query_params.get('search', None)
+        print(search)
+        if search:
+            snippets = Article.objects.filter(title__icontains=search)
+        else:
+            snippets = Article.objects.all()
         serializer = ArticleSerializer(snippets, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        serializer = ArticleSerializer(data=request.data)
+        serializer = CreateArticleSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -28,6 +36,8 @@ class ArticleDetail(APIView):
     """
     Retrieve, update or delete a snippet instance.
     """
+    permission_classes = [AllowAny]
+
     def get_object(self, pk):
         try:
             return Article.objects.get(pk=pk)
@@ -41,7 +51,7 @@ class ArticleDetail(APIView):
 
     def put(self, request, pk, format=None):
         snippet = self.get_object(pk)
-        serializer = ArticleSerializer(snippet, data=request.data)
+        serializer = CreateArticleSerializer(snippet, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

@@ -31,7 +31,7 @@ environ.Env.read_env(f'{BASE_DIR}/.env')
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8+t5@rh+_)+08k4uqca0m8=n^dy#&=fktp%zwgk3mrg8$!p7#s'
+SECRET_KEY = env('SECRET_KEY', default='secret')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -120,6 +120,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
@@ -142,4 +147,6 @@ STATIC_URL = '/static/'
 
 # CORS headers settings
 CORS_ORIGIN_ALLOW_ALL = env('CORS_ORIGIN_ALLOW_ALL', default=False)
-CORS_ORIGIN_WHITELIST = env('CORS_ORIGIN_WHITELIST', default=('http://localhost:8000', ))
+CORS_ORIGIN_WHITELIST = env('CORS_ORIGIN_WHITELIST', default=('http://localhost:8080', ))
+
+AUTH_USER_MODEL = 'user.Author'
