@@ -31,10 +31,22 @@ class LoginView(APIView):
 
     @staticmethod
     def post(request):
-        author = authenticate(
-            username=request.data.get("username"),
-            password=request.data.get("password"),
-        )
+        username = request.data.get("username")
+        author_instance = Author.objects.filter(email=username).first()
+        print(username)
+        print(author_instance)
+        if author_instance:
+            print(author_instance.username)
+            author = authenticate(
+                username=author_instance.username,
+                password=request.data.get("password"),
+            )
+        else:
+            author = authenticate(
+                username=username,
+                password=request.data.get("password"),
+            )
+        print(author)
         if author is None or not author.is_active:
             return Response({
                 'message': 'Username or password incorrect'
