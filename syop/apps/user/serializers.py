@@ -29,6 +29,12 @@ class AuthorLoginSerializer(ModelSerializer):
         exclude = ('password',)
 
 
+class AuthorProfileSerializer(ModelSerializer):
+    class Meta:
+        model = Author
+        fields = ['username', 'email', 'first_name', 'last_name']
+
+
 class UniqueEmailSerializer(ModelSerializer):
     class Meta:
         model = Author

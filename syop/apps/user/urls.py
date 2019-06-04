@@ -1,6 +1,14 @@
 from django.urls import path, re_path
 
-from .views import AuthorRegisterView, LoginView, LogoutView, CheckUniqueEmail, CheckUniqueUsername, CheckToken
+from .views import (
+    AuthorRegisterView,
+    CheckUniqueEmail,
+    CheckUniqueUsername,
+    CheckToken,
+    LoginView,
+    LogoutView,
+    StandartUserView
+)
 
 urlpatterns = [
     path('register/', AuthorRegisterView.as_view(), name="register"),
@@ -10,4 +18,6 @@ urlpatterns = [
     path('checkToken/', CheckToken.as_view(), name="check_token"),
     path('checkEmail/', CheckUniqueEmail.as_view(), name="check_unique_email"),
     path('checkUsername/', CheckUniqueUsername.as_view(), name="check_unique_username"),
+    path('checkUsername/', CheckUniqueUsername.as_view(), name="check_unique_username"),
+    path('changeAccountDetails/<int:pk>/', StandartUserView.as_view(), name="change_account_details/"),
 ]

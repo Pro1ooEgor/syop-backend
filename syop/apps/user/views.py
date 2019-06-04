@@ -2,14 +2,14 @@ from uuid import uuid4
 
 from django.contrib.auth import authenticate, logout, login
 from django.db.models.functions import Lower
+from django.http import Http404
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
 from user.serializers import AuthorCreateSerializer, AuthorLoginSerializer, \
-    UniqueEmailSerializer, UniqueUsernameSerializer
+    AuthorProfileSerializer, UniqueEmailSerializer, UniqueUsernameSerializer
 from user.models import Author
 
 
@@ -33,10 +33,7 @@ class LoginView(APIView):
     def post(request):
         username = request.data.get("username")
         author_instance = Author.objects.filter(email=username).first()
-        print(username)
-        print(author_instance)
         if author_instance:
-            print(author_instance.username)
             author = authenticate(
                 username=author_instance.username,
                 password=request.data.get("password"),
@@ -46,7 +43,6 @@ class LoginView(APIView):
                 username=username,
                 password=request.data.get("password"),
             )
-        print(author)
         if author is None or not author.is_active:
             return Response({
                 'message': 'Username or password incorrect'
@@ -87,7 +83,6 @@ class CheckToken(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         author = Author.objects.filter(token=token)
-
         if author.exists():
             return Response(AuthorLoginSerializer(author.first()).data)
 
@@ -131,3 +126,21 @@ class CheckUniqueUsername(APIView):
                 'error': 'Account with this username already exists'
             })
         return Response(UniqueUsernameSerializer(request.query_params).data)
+
+
+class StandartUserView(APIView):
+    permission_classes = [AllowAny]
+
+    def get_object(self, pk):
+        try:
+            return Author.objects.get(pk=pk)
+        except Author.DoesNotExist:
+            raise Http404
+
+    def put(self, request, pk):
+        author = self.get_object(pk)
+        serializer = AuthorProfileSerializer(author, data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            if user:
+                return Response(serializer.data)
