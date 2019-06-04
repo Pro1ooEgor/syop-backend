@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,9 +17,8 @@ class ArticleList(APIView):
 
     def get(self, request, format=None):
         search = request.query_params.get('search', None)
-        print(search)
         if search:
-            snippets = Article.objects.filter(title__icontains=search)
+            snippets = Article.objects.filter(Q(title__icontains=search) | Q(author__username=search))
         else:
             snippets = Article.objects.all()
         serializer = ArticleSerializer(snippets, many=True)
